@@ -30,10 +30,10 @@ An advanced storage system for FiveM
 
 ## Preview
 
-### [Video]()
+### [Video](https://youtu.be/9XMW34E0tlA)
 
 ![Discord Log](https://i.imgur.com/TDfftS2.png)
-![Main Page]()
+![Main Page](https://i.imgur.com/31JRECV.png)
 
 ## Installation
 
