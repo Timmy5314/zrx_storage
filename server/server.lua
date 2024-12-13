@@ -147,10 +147,10 @@ RegisterNetEvent('zrx_storage:server:deleteStash', function(configId)
 end)
 
 lib.cron.new('*/15 * * * *', function()
-    local selectQuery = [[
+    local selectQuery = ([[
         SELECT * FROM zrx_storage
-        WHERE last_edited < NOW() - INTERVAL 7 DAY
-    ]]
+        WHERE last_edited < NOW() - INTERVAL %s DAY
+    ]]):format(Config.PayInterval)
 
     local rows = MySQL.query.await(selectQuery)
     local stashId
@@ -166,7 +166,7 @@ lib.cron.new('*/15 * * * *', function()
                 if xAccount.money >= data2.price then
                     xPlayer.removeAccountMoney(Config.PayAccount, data2.price, 'Storage fee')
 
-                    CORE.Bridge.notification(xPlayer.source, Strings.automatic_success:format(data2.label), Strings.storage, 'error')
+                    CORE.Bridge.notification(xPlayer.source, Strings.automatic_success:format(data2.label), Strings.storage, 'success')
                 else
                     for k, data3 in pairs(STASHES) do
                         if xPlayer.identifier == data3.owner then
