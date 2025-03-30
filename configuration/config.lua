@@ -1,9 +1,8 @@
 Config = {}
 
 Config.CheckForUpdates = true --| Check for updates?
-Config.InteractDistance = 2
-Config.ShowDistance = 50
-Config.InteractKey = 'E' --| Keymapping
+Config.InteractDistance = 2 -- Afstand voor ox_target interactie
+Config.ShowDistance = 50 -- Afstand voor Text UI (optioneel, kan verwijderd worden als je geen Text UI wilt)
 Config.PayAccount = 'bank' --| common: money or bank
 Config.PayInterval = 7 --| Days
 
@@ -21,6 +20,8 @@ Config.Stashes = {
     ['train_station'] = {
         coords = vec3(495.7195, -638.9720, 25.0627),
         label = 'Train Station Storage',
+        pedModel = 'a_m_m_business_01', -- Ped-model voor deze stash
+        pedScenario = 'WORLD_HUMAN_STAND_IMPATIENT', -- Scenario voor de ped
         types = {
             {
                 name = 'Small storage',
@@ -45,6 +46,8 @@ Config.Stashes = {
     ['south_side'] = {
         coords = vec3(-72.8946, -1820.9869, 26.9422),
         label = 'South Side Storage',
+        pedModel = 'a_f_y_business_01', -- Ander ped-model (vrouwelijke zakenpersoon)
+        pedScenario = 'WORLD_HUMAN_LEANING', -- Ander scenario (leunen tegen muur)
         types = {
             {
                 name = 'Small storage',
