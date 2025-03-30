@@ -12,22 +12,23 @@ discord 'https://discord.gg/mcN25FJ33K'
 
 dependencies {
     'zrx_utility',
-	'ox_lib',
-	'oxmysql',
-	'ox_inventory'
+    'ox_lib',
+    'oxmysql',
+    'ox_inventory',
+    'ox_target' -- Toegevoegd voor ox_target functionaliteit
 }
 
 shared_scripts {
-	'@ox_lib/init.lua',
-	'@es_extended/imports.lua',
+    '@ox_lib/init.lua',
+    '@es_extended/imports.lua',
     'configuration/*.lua'
 }
 
 server_scripts {
-	'@oxmysql/lib/MySQL.lua',
-	'server/*.lua'
+    '@oxmysql/lib/MySQL.lua',
+    'server/*.lua'
 }
 
 client_scripts {
-	'client/*.lua'
+    'client/*.lua'
 }
