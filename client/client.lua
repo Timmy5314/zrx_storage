@@ -1,6 +1,6 @@
----@diagnostic disable: param-type-mismatch
 CORE = exports.zrx_utility:GetUtility()
 
+-- Thread om nabijheid te controleren en Text UI te tonen (optioneel)
 CreateThread(function()
     local pedCoords
 
@@ -8,10 +8,6 @@ CreateThread(function()
         pedCoords = GetEntityCoords(cache.ped)
 
         for k, data in pairs(Config.Stashes) do
-            if #(pedCoords - data.coords) <= Config.ShowDistance then
-                DrawMarker(0, data.coords.x, data.coords.y, data.coords.z, nil, nil, nil, nil, nil, nil, 0.5, 0.5, 0.5, 255, 255, 255, 255, true, true, 2, true, nil, nil, nil)
-            end
-
             if #(pedCoords - data.coords) <= Config.InteractDistance then
                 CORE.Bridge.showTextUI(Strings.open_menu:format(data.label), {
                     icon = 'hand',
@@ -29,12 +25,54 @@ CreateThread(function()
     end
 end)
 
+-- Blips toevoegen voor stash-locaties
 CreateThread(function()
     for k, data in pairs(Config.Stashes) do
         CORE.Client.CreateBlip(data.coords, 473, 12, 0.5, data.label)
     end
 end)
 
+-- Peds spawnen en ox_target toevoegen
+CreateThread(function()
+    for k, data in pairs(Config.Stashes) do
+        -- Ped spawnen
+        local pedModel = `a_m_m_business_01` -- Voorbeeldmodel, aanpasbaar in Config
+        RequestModel(pedModel)
+        while not HasModelLoaded(pedModel) do
+            Wait(100)
+        end
+
+        local ped = CreatePed(4, pedModel, data.coords.x, data.coords.y, data.coords.z - 1.0, 0.0, false, true)
+        SetEntityAsMissionEntity(ped, true, true)
+        SetBlockingOfNonTemporaryEvents(ped, true)
+        FreezeEntityPosition(ped, true) -- Ped blijft op zijn plaats
+        SetEntityInvincible(ped, true) -- Ped kan niet worden gedood
+
+        -- Scenario laten uitvoeren
+        TaskStartScenarioInPlace(ped, "WORLD_HUMAN_STAND_IMPATIENT", 0, true)
+
+        -- ox_target toevoegen aan de ped
+        exports.ox_target:addLocalEntity(ped, {
+            {
+                label = Strings.open_menu:format(data.label),
+                icon = 'fa-solid fa-hand',
+                onSelect = function()
+                    local stashData = lib.callback.await('zrx_storage:server:getStashData', 1000, k)
+
+                    if stashData then
+                        ManageStash(k, stashData)
+                    else
+                        MenuStash(k)
+                    end
+                end
+            }
+        })
+
+        SetModelAsNoLongerNeeded(pedModel)
+    end
+end)
+
+-- Key mapping (optioneel)
 CORE.Client.RegisterKeyMappingCommand('openNearbyStash', Strings.open_storage, Config.InteractKey, function()
     local pedCoords = GetEntityCoords(cache.ped)
     local stashData
@@ -54,6 +92,7 @@ CORE.Client.RegisterKeyMappingCommand('openNearbyStash', Strings.open_storage, C
     end
 end)
 
+-- ManageStash functie
 ManageStash = function(configId, stashData)
     local MENU = {}
 
@@ -63,7 +102,7 @@ ManageStash = function(configId, stashData)
         icon = 'fa-solid fa-lock-open',
         arrow = true,
         onSelect = function()
-            exports.ox_inventory:openInventory('stash', { id = stashData.stash_open, owner = stashData.owner})
+            exports.ox_inventory:openInventory('stash', { id = stashData.stash_open, owner = stashData.owner })
         end
     }
 
@@ -88,6 +127,7 @@ ManageStash = function(configId, stashData)
     }, MENU, Config.Menu ~= 'menu', Config.Menu.position)
 end
 
+-- DeleteStash functie
 DeleteStash = function(configId, stashData)
     local alert = CORE.Bridge.alertDialog(
         Strings.delete_alert_title,
@@ -103,6 +143,7 @@ DeleteStash = function(configId, stashData)
     end
 end
 
+-- MenuStash functie
 MenuStash = function(configId)
     local configData = Config.Stashes[configId]
     local MENU = {}
@@ -147,6 +188,7 @@ MenuStash = function(configId)
     }, MENU, Config.Menu ~= 'menu', Config.Menu.position)
 end
 
+-- BuyStash functie
 BuyStash = function(data, configId)
     local alert = CORE.Bridge.alertDialog(
         Strings.buy_title,
